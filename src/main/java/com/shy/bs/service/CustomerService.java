@@ -1,0 +1,12 @@
+package com.shy.bs.service;
+
+import com.baomidou.mybatisplus.extension.service.IService;
+import com.shy.bs.pojo.Customer;
+
+
+/**
+ * @author night
+ * @date 2022/10/21 20:09
+ */
+public interface CustomerService extends IService<Customer> {
+}
