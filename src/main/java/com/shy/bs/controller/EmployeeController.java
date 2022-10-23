@@ -6,6 +6,7 @@ import com.shy.bs.service.EmployeeService;
 import com.shy.bs.util.ServerResponse;
 import com.shy.bs.vo.EmployeeQuery;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -26,17 +27,20 @@ public class EmployeeController {
     @Autowired
     private EmployeeService employeeService;
 
+    @ApiOperation("添加雇员")
     @PostMapping("addEmployee")
     public ServerResponse addEmployee(Employee employee) {
         return employeeService.addEmployee(employee);
     }
 
+    @ApiOperation("获取员工列表")
     @RequestMapping(value = "getList", method = RequestMethod.GET)
     public ServerResponse getList(EmployeeQuery employeeQuery) {
 
         return employeeService.getList(employeeQuery);
     }
 
+    @ApiOperation("更新员工信息")
     @RequestMapping(value = "update", method = RequestMethod.POST)
     public ServerResponse update(Employee employee) {
         return employeeService.updateEmployee(employee);

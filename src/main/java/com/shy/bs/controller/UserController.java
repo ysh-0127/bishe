@@ -51,7 +51,7 @@ public class UserController {
         log.info("data:{}", "用户退出");
         return ServerResponse.createBySuccess();
     }
-
+    @ApiOperation("获取登录信息")
     @PostMapping("info")
     public ServerResponse info(String token, HttpSession session) {
         boolean isEX = JwtHelper.isExpiration(token);
@@ -66,18 +66,20 @@ public class UserController {
         return ServerResponse.createBySuccess(Employee);
     }
 
+    @ApiOperation("更新雇员信息")
     @PostMapping("updateMessage")
     public ServerResponse updateMessage(Employee employee) {
         return employeeService.updateEmployee(employee);
     }
 
+    @ApiOperation("验证密码")
     @PostMapping("validPassword")
     public ServerResponse validPassword(HttpSession session, String validPass) {
         Long employeeId = JwtHelper.getUserId(String.valueOf(session.getAttribute(Const.CURRENT_USER)));
         return employeeService.validPassword(employeeId, validPass);
     }
 
-
+    @ApiOperation("修改密码")
     @PostMapping("updatePassword")
     public ServerResponse updatePassword(HttpSession session, String oldPass, String newPass) {
         Long token = JwtHelper.getUserId(String.valueOf(session.getAttribute(Const.CURRENT_USER)));

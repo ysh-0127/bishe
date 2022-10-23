@@ -5,14 +5,80 @@
 <mapper namespace="com.shy.bs.mapper.OrderDetailsMapper">
 
     <resultMap id="BaseResultMap" type="com.shy.bs.pojo.OrderDetails">
-            <id property="id" column="id" jdbcType="VARCHAR"/>
-            <result property="orderId" column="order_id" jdbcType="BIGINT"/>
-            <result property="carId" column="car_id" jdbcType="BIGINT"/>
-            <result property="carNumber" column="car_number" jdbcType="INTEGER"/>
+        <id property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="orderId" column="order_id" jdbcType="BIGINT"/>
+        <result property="carId" column="car_id" jdbcType="BIGINT"/>
+        <result property="carNumber" column="car_number" jdbcType="INTEGER"/>
     </resultMap>
 
     <sql id="Base_Column_List">
-        id,order_id,car_id,
+        id
+        ,order_id,car_id,
         car_number
     </sql>
+    <select id="selectYesterdayNum" resultType="java.lang.Integer">
+        select IFNULL(sum(car_number), 0) value
+        from order_details
+            INNER JOIN `order`
+        on order_details.order_id = `order`.id
+    <![CDATA[
+        where TO_DAYS( NOW( ) ) - TO_DAYS(pay_time) < 2 and TO_DAYS( NOW( ) ) - TO_DAYS(pay_time) >= 1
+        ]]>
+    </select>
+    <select id="selectSalesChart" resultType="com.shy.bs.vo.SalesChart">
+        -- 利润
+        SELECT e.date, income, expenditure, income - expenditure profit
+        FROM base_month b
+                 INNER JOIN (
+            -- 收入
+            SELECT date, IFNULL(SUM (total_price), 0) income
+            FROM base_month
+                LEFT JOIN `order`
+            ON date = date_format(pay_time,'%Y-%m')
+        <![CDATA[
+            WHERE date <= #{end}
+              AND date >= #{start}
+        ]]>
+        GROUP BY date
+        ) i ON i.date = b.date
+                 INNER JOIN (
+            -- 支出
+            SELECT date, IFNULL(SUM ((repertory+IFNULL(num, 0))*price), 0) expenditure
+            FROM base_month
+                LEFT JOIN car
+            ON date = date_format(create_time,'%Y-%m')
+                LEFT JOIN (
+                SELECT car_id, SUM (car_number) num FROM order_details
+                GROUP BY car_id
+                ) o on o.car_id = car.id
+        <![CDATA[
+            WHERE date <= #{end}
+              AND date >= #{start}
+        ]]>
+        GROUP BY date
+        ) e ON e.date = b.date
+        GROUP BY e.date
+    </select>
+    <select id="selectIndexSales" resultType="com.shy.bs.vo.IndexSales">
+        SELECT SUM(total_price) sales, SUM(car_number) saleNum
+        FROM `order`
+                 INNER JOIN order_details ON order_id = `order`.id
+        WHERE DATE_FORMAT(pay_time, '%Y-%m') = DATE_FORMAT(NOW(), '%Y-%m')
+          AND employee_id = #{id}
+    </select>
+    <select id="selectEmpChart" resultType="com.shy.bs.vo.EmpChart">
+        SELECT CONCAT_WS('/', brand.brand_name, series.series_name) name, SUM(num * sale_price) value
+        FROM car
+            INNER JOIN (
+            SELECT car_id, SUM (car_number) num FROM order_details
+            INNER JOIN `order` ON order_details.order_id = `order`.id
+            WHERE DATE_FORMAT(pay_time, '%Y-%m') = #{date}
+            AND employee_id = #{id}
+            GROUP BY car_id
+            ) o
+        ON car.id = o.car_id
+            INNER JOIN series ON car.series_id = series.series_id
+            INNER JOIN brand ON series.brand_id = brand.brand_id
+        GROUP BY series.series_id
+    </select>
 </mapper>
