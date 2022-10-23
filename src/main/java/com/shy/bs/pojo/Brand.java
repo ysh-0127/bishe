@@ -1,7 +1,9 @@
 package com.shy.bs.pojo;
 
-import java.io.Serializable;
+import com.baomidou.mybatisplus.annotation.TableLogic;
 import lombok.Data;
+
+import java.io.Serializable;
 
 /**
  * @TableName brand
@@ -12,7 +14,9 @@ public class Brand implements Serializable {
 
     private String brandName;
 
-    private String status;
+    private Integer status;
 
+    @TableLogic//逻辑删除
+    private Integer isDelete;
     private static final long serialVersionUID = 1L;
 }

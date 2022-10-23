@@ -54,7 +54,7 @@ public class Swagger2Config {
                 .title("网站-API文档")
                 .description("本文档描述了网站接口定义")
                 .version("1.0")
-                .contact(new Contact("shy", "http://localhost:8080/swagger-ui/index.html", "1043701463@qq.com"))
+                .contact(new Contact("shy", "http://localhost:8081/swagger-ui/index.html", "1043701463@qq.com"))
                 .build();
     }
 

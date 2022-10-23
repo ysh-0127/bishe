@@ -1,9 +1,11 @@
 package com.shy.bs.pojo;
 
+import com.baomidou.mybatisplus.annotation.TableLogic;
+import lombok.Data;
+
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
-import lombok.Data;
 
 /**
  * @TableName order
@@ -25,7 +27,7 @@ public class Order implements Serializable {
     private Date payTime;
 
     private Date updateTime;
-
+    @TableLogic//逻辑删除
     private Integer isDelete;
 
     private static final long serialVersionUID = 1L;

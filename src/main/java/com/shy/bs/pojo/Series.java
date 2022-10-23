@@ -1,7 +1,9 @@
 package com.shy.bs.pojo;
 
-import java.io.Serializable;
+import com.baomidou.mybatisplus.annotation.TableLogic;
 import lombok.Data;
+
+import java.io.Serializable;
 
 /**
  * @TableName series
@@ -15,6 +17,9 @@ public class Series implements Serializable {
     private String seriesName;
 
     private String status;
+
+    @TableLogic//逻辑删除
+    private Integer isDelete;
 
     private static final long serialVersionUID = 1L;
 }

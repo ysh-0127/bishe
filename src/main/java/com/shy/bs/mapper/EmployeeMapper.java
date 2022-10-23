@@ -11,6 +11,7 @@ import com.shy.bs.pojo.Employee;
 */
 public interface EmployeeMapper extends BaseMapper<Employee> {
 
+
 }
 
 
