@@ -2,6 +2,7 @@ package com.shy.bs.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.shy.bs.pojo.Car;
+import org.apache.ibatis.annotations.Param;
 
 /**
 * @author night
@@ -11,6 +12,7 @@ import com.shy.bs.pojo.Car;
 */
 public interface CarMapper extends BaseMapper<Car> {
 
+    int updateRepertoryByid(Long carId, @Param("carNumber") int num);
 }
 
 

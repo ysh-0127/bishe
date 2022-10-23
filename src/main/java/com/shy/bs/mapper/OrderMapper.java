@@ -1,8 +1,11 @@
 package com.shy.bs.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.shy.bs.pojo.Order;
 import com.shy.bs.vo.EmpChart;
+import com.shy.bs.vo.OrderList;
+import com.shy.bs.vo.OrderQuery;
 
 import java.util.List;
 
@@ -17,6 +20,10 @@ public interface OrderMapper extends BaseMapper<Order> {
     List<EmpChart> selectChartByDate(String date);
 
     List<EmpChart> selectYesterdayChart();
+
+
+    IPage<OrderList> getListPage(int page, int limit, OrderQuery orderQuery);
+
 }
 
 

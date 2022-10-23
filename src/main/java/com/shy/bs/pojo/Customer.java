@@ -2,6 +2,7 @@ package com.shy.bs.pojo;
 
 import com.baomidou.mybatisplus.annotation.TableLogic;
 import lombok.Data;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -18,7 +19,7 @@ public class Customer implements Serializable {
     private String phone;
 
     private String idCard;
-
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date createTime;
 
     @TableLogic//逻辑删除

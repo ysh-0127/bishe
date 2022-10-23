@@ -2,6 +2,7 @@ package com.shy.bs.pojo;
 
 import com.baomidou.mybatisplus.annotation.TableLogic;
 import lombok.Data;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -25,7 +26,7 @@ public class Car implements Serializable {
     private BigDecimal salePrice;
 
     private Integer repertory;
-
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date createTime;
 
     private String status;

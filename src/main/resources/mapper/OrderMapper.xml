@@ -40,4 +40,34 @@
     ]]>
     GROUP BY employee_id
     </select>
+    <select id="getListPage" resultType="com.shy.bs.vo.OrderList" parameterType="com.shy.bs.vo.OrderQuery">
+        select `order`.id orderId, c.id customerId, c.name customerName, c.phone customerPhone,
+        c.id_card customerIdCard, e.name employeeName,
+        total_price totalPrice, `order`.status status,
+        `order`.create_time createTime, pay_time payTime, update_time updateTime
+        from `order`
+        inner join employee e on `order`.employee_id = e.id
+        inner join customer c on `order`.customer_id = c.id
+        <where>
+            <if test="orderQuery.orderId != null and orderQuery.orderId != ''">
+                and `order`.id = #{orderQuery.orderId}
+            </if>
+            <if test="orderQuery.customerName != null and orderQuery.customerName != ''">
+                and c.name = #{orderQuery.customerName}
+            </if>
+            <if test="orderQuery.employeeName != null and orderQuery.employeeName != ''">
+                and e.name = #{orderQuery.employeeName}
+            </if>
+            <if test="orderQuery.status != null and orderQuery.status != ''">
+                and `order`.status = #{orderQuery.status}
+            </if>
+        </where>
+        <if test="orderQuery.orderBy != null and orderQuery.orderBy != ''">
+            order by ${orderQuery.orderBy}
+        </if>
+        limit #{page},#{limit}
+
+
+    </select>
+
 </mapper>

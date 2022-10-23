@@ -71,6 +71,7 @@ public class EmployeeServiceImpl extends ServiceImpl<EmployeeMapper, Employee> i
         Page<Employee> pageParam = new Page<>(employeeQuery.getPage(), employeeQuery.getLimit());
 
         IPage<Employee> pageRs = baseMapper.selectPage(pageParam, queryWrapper);
+
         List<Employee> list = pageRs.getRecords();
         if (list != null) {
             ListVo listVo = new ListVo();
@@ -85,9 +86,8 @@ public class EmployeeServiceImpl extends ServiceImpl<EmployeeMapper, Employee> i
     public ServerResponse addEmployee(Employee employee) {
         employee.setId(createEmployeeId());
         employee.setRole(Const.Number.ONE);
-        System.out.println(employee);
         int resultCount = baseMapper.insert(employee);
-        if (resultCount > 0) {
+        if (resultCount != 0) {
             return ServerResponse.createBySuccess();
         }
         return ServerResponse.createByErrorMessage("添加失败");
