@@ -1,8 +1,7 @@
 package com.shy.bs.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.github.pagehelper.PageHelper;
 import com.shy.bs.mapper.CarMapper;
 import com.shy.bs.mapper.OrderDetailsMapper;
 import com.shy.bs.mapper.OrderMapper;
@@ -23,8 +22,10 @@ import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 import javax.annotation.Resource;
 import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.Date;
+import java.util.List;
+import java.util.Random;
+import java.util.UUID;
 
 /**
  * @author night
@@ -42,7 +43,6 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
     private CarMapper carMapper;
     @Autowired
     private CustomerService customerService;
-
     @Override
     public ServerResponse addOrder(OrderVo orderVo) {
         Order order = new Order();
@@ -98,21 +98,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
 
     @Override
     public ServerResponse getList(OrderQuery orderQuery) {
-
-//        Page<OrderQuery> pageParam = new Page<>(orderQuery.getPage(), orderQuery.getLimit());
-        Page<Order> pageRs = new Page<>(orderQuery.getPage(), orderQuery.getLimit());
-        LambdaQueryWrapper<Order> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(Objects.nonNull(orderQuery.getOrderId()), Order::getId, orderQuery.getOrderId());
-        queryWrapper.eq(Objects.nonNull(orderQuery.getStatus()), Order::getStatus, orderQuery.getStatus());
-        page(pageRs, queryWrapper);
-        List<Order> orders = pageRs.getRecords();
-        List<OrderList> list = orders.stream().map(order -> {
-
-            OrderList orderList = new OrderList();
-            orderList.setOrderId(order.getId());
-            orderList.setCustomerId(order.getCustomerId());
-            return orderList;
-        }).collect(Collectors.toList());
+        List<OrderList> list = PageHelper.startPage(orderQuery.getPage(), orderQuery.getLimit()).doSelectPage(() -> orderMapper.selectSale(orderQuery));
         if (list != null) {
             for (OrderList orderList : list) {
                 List<Details> details = detailsMapper.selectDetailsByOrderId(orderList.getOrderId());
@@ -120,11 +106,12 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
             }
             ListVo listVo = new ListVo();
             listVo.setItems(list);
-            listVo.setTotal(pageRs.getTotal());
+            listVo.setTotal(PageHelper.count(() -> orderMapper.selectSale(orderQuery)));
             return ServerResponse.createBySuccess(listVo);
         }
-        return ServerResponse.createByErrorMessage("获取客户列表失败");
+        return ServerResponse.createByErrorMessage("获取订单列表失败");
     }
+
 
     //图表
     @Override
@@ -149,7 +136,6 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
     /**
      * 订单编号
      * 格式为：yyMMdd 加6位递增的数字，数字每天重置为1
-     *
      * @return
      */
     private Long createOrderId() {

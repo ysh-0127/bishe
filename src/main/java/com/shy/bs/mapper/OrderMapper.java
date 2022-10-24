@@ -1,7 +1,6 @@
 package com.shy.bs.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.shy.bs.pojo.Order;
 import com.shy.bs.vo.EmpChart;
 import com.shy.bs.vo.OrderList;
@@ -22,8 +21,7 @@ public interface OrderMapper extends BaseMapper<Order> {
     List<EmpChart> selectYesterdayChart();
 
 
-    IPage<OrderList> getListPage(int page, int limit, OrderQuery orderQuery);
-
+    List<OrderList> selectSale(OrderQuery orderQuery);
 }
 
 

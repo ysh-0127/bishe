@@ -40,7 +40,7 @@
     ]]>
     GROUP BY employee_id
     </select>
-    <select id="getListPage" resultType="com.shy.bs.vo.OrderList" parameterType="com.shy.bs.vo.OrderQuery">
+    <select id="selectSale" resultType="com.shy.bs.vo.OrderList" parameterType="com.shy.bs.vo.OrderQuery">
         select `order`.id orderId, c.id customerId, c.name customerName, c.phone customerPhone,
         c.id_card customerIdCard, e.name employeeName,
         total_price totalPrice, `order`.status status,
@@ -49,25 +49,23 @@
         inner join employee e on `order`.employee_id = e.id
         inner join customer c on `order`.customer_id = c.id
         <where>
-            <if test="orderQuery.orderId != null and orderQuery.orderId != ''">
-                and `order`.id = #{orderQuery.orderId}
+            <if test="orderId != null and orderId != ''">
+                and `order`.id = #{orderId}
             </if>
-            <if test="orderQuery.customerName != null and orderQuery.customerName != ''">
-                and c.name = #{orderQuery.customerName}
+            <if test="customerName != null and customerName != ''">
+                and c.name = #{customerName}
             </if>
-            <if test="orderQuery.employeeName != null and orderQuery.employeeName != ''">
-                and e.name = #{orderQuery.employeeName}
+            <if test="employeeName != null and employeeName != ''">
+                and e.name = #{employeeName}
             </if>
-            <if test="orderQuery.status != null and orderQuery.status != ''">
-                and `order`.status = #{orderQuery.status}
+            <if test="status != null and status != ''">
+                and `order`.status = #{status}
             </if>
         </where>
-        <if test="orderQuery.orderBy != null and orderQuery.orderBy != ''">
-            order by ${orderQuery.orderBy}
+        <if test="orderBy != null and orderBy != ''">
+            order by ${orderBy}
         </if>
-        limit #{page},#{limit}
-
-
     </select>
+
 
 </mapper>
