@@ -2,10 +2,7 @@ package com.shy.bs.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.shy.bs.pojo.OrderDetails;
-import com.shy.bs.vo.Details;
-import com.shy.bs.vo.EmpChart;
-import com.shy.bs.vo.IndexSales;
-import com.shy.bs.vo.SalesChart;
+import com.shy.bs.vo.*;
 
 import java.util.List;
 
@@ -26,6 +23,12 @@ public interface OrderDetailsMapper extends BaseMapper<OrderDetails> {
     List<EmpChart> selectEmpChart(Integer id, String date);
 
     List<Details> selectDetailsByOrderId(Long orderId);
+
+    List<OrderDetails> selectByOrderId(Long orderId);
+
+    List<DetailsList> selectSelective(DetailsQuery detailsQuery);
+
+    ;
 }
 
 

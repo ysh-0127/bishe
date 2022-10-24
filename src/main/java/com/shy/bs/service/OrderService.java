@@ -2,7 +2,9 @@ package com.shy.bs.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.shy.bs.pojo.Order;
+import com.shy.bs.pojo.OrderDetails;
 import com.shy.bs.util.ServerResponse;
+import com.shy.bs.vo.DetailsQuery;
 import com.shy.bs.vo.OrderQuery;
 import com.shy.bs.vo.OrderVo;
 
@@ -20,4 +22,12 @@ public interface OrderService extends IService<Order> {
 
 
     ServerResponse getList(OrderQuery orderQuery);
+
+    ServerResponse updateOrder(Long orderId, String status);
+
+    ServerResponse updateDetail(OrderDetails orderDetails);
+
+    ServerResponse deleteDetail(String id);
+
+    ServerResponse getDetailsList(DetailsQuery detailsQuery);
 }

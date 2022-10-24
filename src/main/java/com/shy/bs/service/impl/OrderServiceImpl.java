@@ -1,5 +1,6 @@
 package com.shy.bs.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.PageHelper;
 import com.shy.bs.mapper.CarMapper;
@@ -8,19 +9,18 @@ import com.shy.bs.mapper.OrderMapper;
 import com.shy.bs.pojo.Car;
 import com.shy.bs.pojo.Order;
 import com.shy.bs.pojo.OrderDetails;
-import com.shy.bs.service.CustomerService;
 import com.shy.bs.service.OrderService;
 import com.shy.bs.util.Const;
 import com.shy.bs.util.ServerResponse;
 import com.shy.bs.vo.*;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -41,9 +41,11 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
     private OrderDetailsMapper detailsMapper;
     @Resource
     private CarMapper carMapper;
-    @Autowired
-    private CustomerService customerService;
+    @Resource
+    private OrderService orderService;
+
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public ServerResponse addOrder(OrderVo orderVo) {
         Order order = new Order();
         Long orderId = createOrderId();
@@ -82,7 +84,6 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
             int repertory = carRepertory.getRepertory();
             num = repertory - num;
             if (num >= 0) {
-                //
                 result = carMapper.updateRepertoryByid(carRepertory.getId(), num);
                 if (result == 0) {
                     TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
@@ -110,6 +111,108 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
             return ServerResponse.createBySuccess(listVo);
         }
         return ServerResponse.createByErrorMessage("获取订单列表失败");
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public ServerResponse updateOrder(Long orderId, String status) {
+
+        Order order = orderService.getById(orderId);
+        QueryWrapper<Order> queryWrapper1 = new QueryWrapper();
+        queryWrapper1.ne("status", 1);
+        int result = orderMapper.update(order, queryWrapper1);
+        if (result == 0) {
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            return ServerResponse.createByErrorMessage("更新订单失败");
+        }
+        if (status.equals(Const.Number.ONE)) {
+            // status=1，支付订单，更新支付时间
+            QueryWrapper<Order> queryWrapper2 = new QueryWrapper();
+            queryWrapper2.eq("status", 1);
+            result = orderMapper.update(order, queryWrapper2);
+            if (result == 0) {
+                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                return ServerResponse.createByErrorMessage("更新订单失败");
+            }
+        } else if (status.equals(Const.Number.TWO)) {
+            // status=2，取消订单，车辆回库
+            List<OrderDetails> details = detailsMapper.selectByOrderId(orderId);
+            for (OrderDetails orderDetails : details) {
+                result = carMapper.addRepertoryByPrimaryKey(orderDetails.getCarId(), orderDetails.getCarNumber());
+                if (result == 0) {
+                    TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                    return ServerResponse.createByErrorMessage("更新订单失败");
+                }
+            }
+        }
+        return ServerResponse.createBySuccess();
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public ServerResponse updateDetail(OrderDetails orderDetails) {
+        OrderDetails oldDetails = detailsMapper.selectById(orderDetails.getId());
+        int result = carMapper.addRepertoryByPrimaryKey(oldDetails.getCarId(), oldDetails.getCarNumber());
+        if (result == 0) {
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            return ServerResponse.createByErrorMessage("更新失败");
+        }
+        Car carRepertory = carMapper.selectById(orderDetails.getCarId());
+        int repertory = carRepertory.getRepertory();
+        int num = repertory - orderDetails.getCarNumber();
+        if (num >= 0) {
+            result = carMapper.updateRepertoryByid(orderDetails.getCarId(), num);
+            if (result == 0) {
+                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                return ServerResponse.createByErrorMessage("添加订单失败");
+            }
+        } else {
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            return ServerResponse.createByErrorMessage("库存不足，添加订单失败");
+        }
+        result = detailsMapper.updateById(orderDetails);
+        if (result == 0) {
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            return ServerResponse.createByErrorMessage("更新失败");
+        }
+        BigDecimal oldPrice = carMapper.selectSalePriceByPrimaryKey(oldDetails.getCarId()).multiply(BigDecimal.valueOf(oldDetails.getCarNumber()));
+        BigDecimal newPrice = carMapper.selectSalePriceByPrimaryKey(orderDetails.getCarId()).multiply(BigDecimal.valueOf(orderDetails.getCarNumber()));
+        result = orderMapper.addTotalPriceByPrimaryKey(orderDetails.getOrderId(), newPrice.subtract(oldPrice));
+        if (result == 0) {
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            return ServerResponse.createByErrorMessage("更新失败");
+        }
+        return ServerResponse.createBySuccess();
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public ServerResponse deleteDetail(String id) {
+        OrderDetails orderDetails = detailsMapper.selectById(id);
+        BigDecimal totalPrice = carMapper.selectSalePriceByPrimaryKey(orderDetails.getCarId()).negate();
+        int result = orderMapper.addTotalPriceByPrimaryKey(orderDetails.getOrderId(), totalPrice);
+        if (result == 0) {
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            return ServerResponse.createByErrorMessage("删除失败");
+        }
+        result = detailsMapper.deleteById(id);
+        if (result == 0) {
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            return ServerResponse.createByErrorMessage("删除失败");
+        }
+        return ServerResponse.createBySuccess();
+    }
+
+    @Override
+    public ServerResponse getDetailsList(DetailsQuery detailsQuery) {
+        List<DetailsList> list = PageHelper.startPage(detailsQuery.getPage(), detailsQuery.getLimit()).doSelectPage(() -> detailsMapper.selectSelective(detailsQuery));
+        if (list != null) {
+            ListVo listVo = new ListVo();
+            listVo.setItems(list);
+            listVo.setTotal(PageHelper.count(() -> detailsMapper.selectSelective(detailsQuery)));
+            return ServerResponse.createBySuccess(listVo);
+        }
+        return ServerResponse.createByErrorMessage("获取订单详情列表失败");
     }
 
 

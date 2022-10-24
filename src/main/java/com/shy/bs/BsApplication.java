@@ -11,7 +11,11 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class BsApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(BsApplication.class, args);
+//        SpringApplication.run(BsApplication.class, args);
+        SpringApplication springApplication = new SpringApplication(BsApplication.class);
+        springApplication.setAllowCircularReferences(Boolean.TRUE);
+        springApplication.run(args);
+
     }
 
 }

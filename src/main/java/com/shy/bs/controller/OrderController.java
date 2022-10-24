@@ -1,7 +1,9 @@
 package com.shy.bs.controller;
 
+import com.shy.bs.pojo.OrderDetails;
 import com.shy.bs.service.OrderService;
 import com.shy.bs.util.ServerResponse;
+import com.shy.bs.vo.DetailsQuery;
 import com.shy.bs.vo.OrderQuery;
 import com.shy.bs.vo.OrderVo;
 import io.swagger.annotations.Api;
@@ -32,24 +34,24 @@ public class OrderController {
     public ServerResponse getList(OrderQuery orderQuery) {
         return orderService.getList(orderQuery);
     }
-//
-//    @RequestMapping(value = "update", method = RequestMethod.POST)
-//    public ServerResponse update(Long orderId, String status) {
-//        return orderService.update(orderId, status);
-//    }
-//
-//    @RequestMapping(value = "updateDetail", method = RequestMethod.POST)
-//    public ServerResponse updateDetail(OrderDetails orderDetails) {
-//        return orderService.updateDetail(orderDetails);
-//    }
-//
-//    @RequestMapping(value = "deleteDetail", method = RequestMethod.POST)
-//    public ServerResponse deleteDetail(String id) {
-//        return orderService.deleteDetail(id);
-//    }
-//
-//    @RequestMapping(value = "getDetailsList", method = RequestMethod.GET)
-//    public ServerResponse getDetailsList(DetailsQuery detailsQuery) {
-//        return orderService.getDetailsList(detailsQuery);
-//    }
+
+    @PostMapping("update")
+    public ServerResponse update(Long orderId, String status) {
+        return orderService.updateOrder(orderId, status);
+    }
+
+    @PostMapping(value = "updateDetail")
+    public ServerResponse updateDetail(OrderDetails orderDetails) {
+        return orderService.updateDetail(orderDetails);
+    }
+
+    @RequestMapping(value = "deleteDetail", method = RequestMethod.POST)
+    public ServerResponse deleteDetail(String id) {
+        return orderService.deleteDetail(id);
+    }
+
+    @RequestMapping(value = "getDetailsList", method = RequestMethod.GET)
+    public ServerResponse getDetailsList(DetailsQuery detailsQuery) {
+        return orderService.getDetailsList(detailsQuery);
+    }
 }

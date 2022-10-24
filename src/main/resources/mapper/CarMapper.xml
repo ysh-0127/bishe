@@ -24,9 +24,21 @@
         repertory,create_time,status,
         is_delete
     </sql>
+    <insert id="addRepertoryByPrimaryKey">
+        update car
+    <![CDATA[
+        set repertory = repertory + #{carNumber}
+    ]]>
+    where id = #{carId}
+    </insert>
     <update id="updateRepertoryByid">
         update car
         set repertory = #{carNumber}
         where id = #{carId}
     </update>
+    <select id="selectSalePriceByPrimaryKey" resultType="java.math.BigDecimal">
+        select sale_price
+        from car
+        where id = #{carId}
+    </select>
 </mapper>

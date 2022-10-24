@@ -22,6 +22,14 @@
         total_price,status,create_time,
         pay_time,update_time,is_delete
     </sql>
+    <update id="addTotalPriceByPrimaryKey">
+        update `order`
+    <![CDATA[
+        set total_price = total_price + #{totalPrice},
+            update_time = now()
+    ]]>
+    where id = #{orderId}
+    </update>
     <select id="selectChartByDate" resultType="com.shy.bs.vo.EmpChart">
         select e.`name` name, SUM(total_price) value
         from `order`

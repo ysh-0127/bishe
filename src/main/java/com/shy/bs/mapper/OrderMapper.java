@@ -6,6 +6,7 @@ import com.shy.bs.vo.EmpChart;
 import com.shy.bs.vo.OrderList;
 import com.shy.bs.vo.OrderQuery;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -22,6 +23,8 @@ public interface OrderMapper extends BaseMapper<Order> {
 
 
     List<OrderList> selectSale(OrderQuery orderQuery);
+
+    int addTotalPriceByPrimaryKey(Long orderId, BigDecimal subtract);
 }
 
 
