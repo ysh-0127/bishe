@@ -1,7 +1,6 @@
 package com.shy.bs.pojo;
 
 import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -32,8 +31,7 @@ public class Order implements Serializable {
     private Date payTime;
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date updateTime;
-    @TableLogic//逻辑删除
-    private Integer isDelete;
+
 
     private static final long serialVersionUID = 1L;
 }

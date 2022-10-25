@@ -76,7 +76,7 @@ public class CustomerServiceImpl extends ServiceImpl<CustomerMapper, Customer> i
 
     @Override
     public ServerResponse getCustomer(String idCard) {
-        QueryWrapper<Customer> queryWrapper = new QueryWrapper();
+        QueryWrapper<Customer> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("id_card", idCard);
         Customer customer = baseMapper.selectOne(queryWrapper);
 
@@ -90,13 +90,11 @@ public class CustomerServiceImpl extends ServiceImpl<CustomerMapper, Customer> i
     /**
      * 客户编号
      * 格式为：yyMMdd 加 五位递增的数字，数字每天重置为1
-     *
-     * @return
      */
     private Long createCustomerId() {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyMMdd");
         String format = dateFormat.format(new Date()) + "10000";
-        return Long.valueOf(format) + (num++);
+        return Long.parseLong(format) + (num++);
     }
 
     private int num = 1;

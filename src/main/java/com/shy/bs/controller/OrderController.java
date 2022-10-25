@@ -45,12 +45,12 @@ public class OrderController {
         return orderService.updateDetail(orderDetails);
     }
 
-    @RequestMapping(value = "deleteDetail", method = RequestMethod.POST)
+    @PostMapping("deleteDetail")
     public ServerResponse deleteDetail(String id) {
         return orderService.deleteDetail(id);
     }
 
-    @RequestMapping(value = "getDetailsList", method = RequestMethod.GET)
+    @GetMapping("getDetailsList")
     public ServerResponse getDetailsList(DetailsQuery detailsQuery) {
         return orderService.getDetailsList(detailsQuery);
     }

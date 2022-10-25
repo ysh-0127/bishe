@@ -1,6 +1,5 @@
 package com.shy.bs.pojo;
 
-import com.baomidou.mybatisplus.annotation.TableLogic;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -30,8 +29,7 @@ public class Car implements Serializable {
     private Date createTime;
 
     private String status;
-    @TableLogic//逻辑删除
-    private Integer isDelete;
+
 
     private static final long serialVersionUID = 1L;
 }

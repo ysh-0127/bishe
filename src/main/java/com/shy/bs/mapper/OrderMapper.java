@@ -24,7 +24,7 @@ public interface OrderMapper extends BaseMapper<Order> {
 
     List<OrderList> selectSale(OrderQuery orderQuery);
 
-    int addTotalPriceByPrimaryKey(Long orderId, BigDecimal subtract);
+    int addTotalPriceByPrimaryKey(Long orderId, BigDecimal totalPrice);
 }
 
 

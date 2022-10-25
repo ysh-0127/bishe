@@ -13,8 +13,7 @@
             <result property="salePrice" column="sale_price" jdbcType="DECIMAL"/>
             <result property="repertory" column="repertory" jdbcType="INTEGER"/>
             <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
-        <result property="status" column="status" jdbcType="VARCHAR"/>
-        <result property="isDelete" column="is_delete" jdbcType="TINYINT"/>
+            <result property="status" column="status" jdbcType="VARCHAR"/>
     </resultMap>
 
     <sql id="Base_Column_List">
@@ -41,4 +40,36 @@
         from car
         where id = #{carId}
     </select>
+    <select id="selectSelective" parameterType="com.shy.bs.vo.StoreQuery" resultType="com.shy.bs.vo.StoreList">
+        select
+        id, brand_name brandName, series_name seriesName,
+        car.series_id seriesId, series.brand_id brandId,
+        type, color, price, sale_price salePrice,
+        repertory, create_time createTime, car.status status
+        from car
+        inner join series
+        on car.series_id = series.series_id
+        inner join brand
+        on series.brand_id = brand.brand_id
+        <where>
+            <choose>
+                <when test="id != null and id != ''">
+                    id = #{id}
+                </when>
+                <when test="seriesId != null and seriesId != ''">
+                    car.series_id = #{seriesId}
+                </when>
+                <when test="brandId != null and brandId != ''">
+                    brand.brand_id = #{brandId}
+                </when>
+            </choose>
+            <if test="status != null and status != ''">
+                and car.status = #{status}
+            </if>
+        </where>
+        <if test="orderBy != null and orderBy != ''">
+            order by ${orderBy}
+        </if>
+    </select>
+
 </mapper>

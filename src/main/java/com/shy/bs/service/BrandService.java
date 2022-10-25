@@ -11,4 +11,8 @@ import com.shy.bs.util.ServerResponse;
  */
 public interface BrandService extends IService<Brand> {
     ServerResponse brandOpt();
+
+    ServerResponse addBrand(String brand);
+
+    ServerResponse delBrand(Integer brandId);
 }

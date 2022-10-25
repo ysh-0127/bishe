@@ -11,4 +11,8 @@ import com.shy.bs.util.ServerResponse;
  */
 public interface SeriesService extends IService<Series> {
     ServerResponse seriesOpt();
+
+    ServerResponse addSeries(Integer brandId, String seriesName);
+
+    ServerResponse delSeries(Integer seriesId);
 }

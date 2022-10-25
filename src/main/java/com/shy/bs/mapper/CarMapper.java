@@ -2,9 +2,12 @@ package com.shy.bs.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.shy.bs.pojo.Car;
+import com.shy.bs.vo.StoreList;
+import com.shy.bs.vo.StoreQuery;
 import org.apache.ibatis.annotations.Param;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * @author night
@@ -19,6 +22,8 @@ public interface CarMapper extends BaseMapper<Car> {
     int addRepertoryByPrimaryKey(Long carId, Integer carNumber);
 
     BigDecimal selectSalePriceByPrimaryKey(Long carId);
+
+    List<StoreList> selectSelective(StoreQuery storeQuery);
 }
 
 

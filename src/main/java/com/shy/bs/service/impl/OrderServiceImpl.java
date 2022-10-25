@@ -41,8 +41,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
     private OrderDetailsMapper detailsMapper;
     @Resource
     private CarMapper carMapper;
-    @Resource
-    private OrderService orderService;
+
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -62,8 +61,8 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
             return ServerResponse.createByErrorMessage("添加订单失败");
         }
         if (orderVo.getStatus().equals(Const.Number.ONE)) {
-            result = orderMapper.updateById(order);
-            if (result == 0) {
+            boolean    rs = updateById(order);
+            if (!rs) {
                 TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
                 return ServerResponse.createByErrorMessage("添加订单失败");
             }
@@ -117,28 +116,32 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
     @Transactional(rollbackFor = Exception.class)
     public ServerResponse updateOrder(Long orderId, String status) {
 
-        Order order = orderService.getById(orderId);
-        QueryWrapper<Order> queryWrapper1 = new QueryWrapper();
+        Order order = getById(orderId);
+        order.setStatus(status);
+        QueryWrapper<Order> queryWrapper1 = new QueryWrapper<>();
         queryWrapper1.ne("status", 1);
-        int result = orderMapper.update(order, queryWrapper1);
-        if (result == 0) {
+        boolean rs = update(order, queryWrapper1);
+        if (!rs) {
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             return ServerResponse.createByErrorMessage("更新订单失败");
         }
         if (status.equals(Const.Number.ONE)) {
             // status=1，支付订单，更新支付时间
-            QueryWrapper<Order> queryWrapper2 = new QueryWrapper();
+            QueryWrapper<Order> queryWrapper2 = new QueryWrapper<>();
             queryWrapper2.eq("status", 1);
-            result = orderMapper.update(order, queryWrapper2);
-            if (result == 0) {
+            order.setPayTime(new Date());
+            rs = update(order, queryWrapper2);
+            if (!rs) {
                 TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
                 return ServerResponse.createByErrorMessage("更新订单失败");
             }
         } else if (status.equals(Const.Number.TWO)) {
             // status=2，取消订单，车辆回库
-            List<OrderDetails> details = detailsMapper.selectByOrderId(orderId);
+            QueryWrapper<OrderDetails> queryWrapper3 = new QueryWrapper<>();
+            queryWrapper3.eq("order_id", orderId);
+            List<OrderDetails> details = detailsMapper.selectList(queryWrapper3);
             for (OrderDetails orderDetails : details) {
-                result = carMapper.addRepertoryByPrimaryKey(orderDetails.getCarId(), orderDetails.getCarNumber());
+                int result = carMapper.addRepertoryByPrimaryKey(orderDetails.getCarId(), orderDetails.getCarNumber());
                 if (result == 0) {
                     TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
                     return ServerResponse.createByErrorMessage("更新订单失败");
@@ -195,8 +198,8 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             return ServerResponse.createByErrorMessage("删除失败");
         }
-        result = detailsMapper.deleteById(id);
-        if (result == 0) {
+        boolean rs = removeById(id);
+        if (!rs) {
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             return ServerResponse.createByErrorMessage("删除失败");
         }
@@ -239,12 +242,11 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
     /**
      * 订单编号
      * 格式为：yyMMdd 加6位递增的数字，数字每天重置为1
-     * @return
      */
     private Long createOrderId() {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyMMdd");
         String format = dateFormat.format(new Date()) + "000000";
-        return Long.valueOf(format) + (num++);
+        return Long.parseLong(format) + (num++);
     }
 
 

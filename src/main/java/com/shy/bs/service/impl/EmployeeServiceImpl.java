@@ -105,13 +105,12 @@ public class EmployeeServiceImpl extends ServiceImpl<EmployeeMapper, Employee> i
     /**
      * 客户编号
      * 格式为：yyMM 加 三位递增的数字，数字每月重置为1
-     *
-     * @return
+
      */
     private Integer createEmployeeId() {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyMM");
         String format = dateFormat.format(new Date()) + "000";
-        return Integer.valueOf(format) + (num++);
+        return Integer.parseInt(format) + (num++);
     }
 
     private int num = 1;
