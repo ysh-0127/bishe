@@ -61,7 +61,8 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
             return ServerResponse.createByErrorMessage("添加订单失败");
         }
         if (orderVo.getStatus().equals(Const.Number.ONE)) {
-            boolean    rs = updateById(order);
+            order.setPayTime(new Date());
+            boolean  rs = updateById(order);
             if (!rs) {
                 TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
                 return ServerResponse.createByErrorMessage("添加订单失败");
@@ -119,7 +120,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         Order order = getById(orderId);
         order.setStatus(status);
         QueryWrapper<Order> queryWrapper1 = new QueryWrapper<>();
-        queryWrapper1.ne("status", 1);
+        queryWrapper1.ne("status", 1).eq("id",orderId);
         boolean rs = update(order, queryWrapper1);
         if (!rs) {
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
@@ -128,8 +129,9 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         if (status.equals(Const.Number.ONE)) {
             // status=1，支付订单，更新支付时间
             QueryWrapper<Order> queryWrapper2 = new QueryWrapper<>();
-            queryWrapper2.eq("status", 1);
+            queryWrapper2.eq("status", 1).eq("id",orderId);
             order.setPayTime(new Date());
+            order.setUpdateTime(new Date());
             rs = update(order, queryWrapper2);
             if (!rs) {
                 TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
@@ -137,6 +139,9 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
             }
         } else if (status.equals(Const.Number.TWO)) {
             // status=2，取消订单，车辆回库
+            Order updateTime =getById(orderId);
+            updateTime.setUpdateTime(new Date());
+            updateById(updateTime);
             QueryWrapper<OrderDetails> queryWrapper3 = new QueryWrapper<>();
             queryWrapper3.eq("order_id", orderId);
             List<OrderDetails> details = detailsMapper.selectList(queryWrapper3);
