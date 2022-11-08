@@ -28,7 +28,6 @@ public interface OrderDetailsMapper extends BaseMapper<OrderDetails> {
 
     List<DetailsList> selectSelective(DetailsQuery detailsQuery);
 
-    ;
 }
 
 
