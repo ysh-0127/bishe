@@ -24,8 +24,6 @@ public interface OrderDetailsMapper extends BaseMapper<OrderDetails> {
 
     List<Details> selectDetailsByOrderId(Long orderId);
 
-    List<OrderDetails> selectByOrderId(Long orderId);
-
     List<DetailsList> selectSelective(DetailsQuery detailsQuery);
 
 }
