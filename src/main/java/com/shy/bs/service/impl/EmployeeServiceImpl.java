@@ -33,7 +33,6 @@ public class EmployeeServiceImpl extends ServiceImpl<EmployeeMapper, Employee> i
     @Override
     public ServerResponse<Employee> login(Integer userId, String password) {
         QueryWrapper<Employee> queryWrapper = new QueryWrapper<>();
-
         queryWrapper.eq("id", userId);
         queryWrapper.eq("password", password);
         Employee employee = baseMapper.selectOne(queryWrapper);
@@ -42,7 +41,6 @@ public class EmployeeServiceImpl extends ServiceImpl<EmployeeMapper, Employee> i
         }
         employee.setPassword(StringUtils.EMPTY);
         return ServerResponse.createBySuccess("登录成功", employee);
-
     }
 
     @Override
